@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../../ami/src/loaders/loaders.js"],"names":["VolumeLoader"],"mappings":";;;;;;;AAAA;;;;;;QAGcA,Y","file":"loaders.js","sourcesContent":["import Volume from './loaders.volume';\r\n\r\nexport {\r\n    Volume as VolumeLoader,\r\n};\r\n"]}

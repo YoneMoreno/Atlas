@@ -1,0 +1,47 @@
+<component name="libraryTable">
+  <library name="Generated files" type="javaScript">
+    <properties>
+      <sourceFilesUrls>
+        <item url="file://$PROJECT_DIR$/dist/ami/lessons/01/demo.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/lessons/03/demo.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/helpers/x/helpers.x.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/models/models.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/specs/loaders/loaders.volume.spec.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/widgets/widgets.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/widgets/widgets.voxelProbe.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/loaders/loaders.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/loaders/loaders.volume.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/lessons/00/demo.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/helpers/x/helpers.x.volume.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/lessons/04/demo.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/models/models.stack.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/ami.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/examples/viewers_upload/viewers_upload.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/build/ami.min.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/lessons/02/demo.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/legacy/vr_doublepass/vr_doublepass.js" />
+      </sourceFilesUrls>
+    </properties>
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/dist/ami/lessons/01/demo.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/lessons/03/demo.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/helpers/x/helpers.x.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/models/models.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/specs/loaders/loaders.volume.spec.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/widgets/widgets.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/widgets/widgets.voxelProbe.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/loaders/loaders.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/loaders/loaders.volume.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/lessons/00/demo.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/helpers/x/helpers.x.volume.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/lessons/04/demo.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/models/models.stack.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/ami.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/examples/viewers_upload/viewers_upload.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/build/ami.min.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/lessons/02/demo.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/legacy/vr_doublepass/vr_doublepass.js" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

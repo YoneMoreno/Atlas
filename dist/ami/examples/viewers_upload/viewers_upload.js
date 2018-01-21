@@ -86,27 +86,42 @@ function init() {
         threeD.appendChild(renderer.domElement);
     }
 
-    // renderer
-
-    // scene
     scene = new THREE.Scene();
-    // camera
-    camera = new _cameras2.default(threeD.clientWidth / -2, threeD.clientWidth / 2, threeD.clientHeight / 2, threeD.clientHeight / -2, 0.1, 10000);
 
-    // controls
-    controls = new _controls2.default(camera, threeD);
-    controls.staticMoving = true;
-    controls.noRotate = true;
-    camera.controls = controls;
+    setCamera();
+
+    function setCamera() {
+        var left = threeD.clientWidth / -2;
+        var right = threeD.clientWidth / 2;
+        var top = threeD.clientHeight / 2;
+        var bottom = threeD.clientHeight / -2;
+        var near = 0.1;
+        var far = 10000;
+        camera = new _cameras2.default(left, right, top, bottom, near, far);
+    }
+
+    setControls();
+
+    function setControls() {
+        var object = camera;
+        var domElement = threeD;
+        controls = new _controls2.default(object, domElement);
+        controls.staticMoving = true;
+        controls.noRotate = true;
+        camera.controls = controls;
+    }
 
     animate();
 }
 
 window.onload = function () {
-    // hookup load button
-    document.getElementById('buttoninput').onclick = function () {
-        document.getElementById('filesinput').click();
-    };
+    setFileInputOnButtonClick();
+
+    function setFileInputOnButtonClick() {
+        document.getElementById('buttoninput').onclick = function () {
+            document.getElementById('filesinput').click();
+        };
+    }
 
     // init threeJS...
     init();
@@ -128,84 +143,193 @@ window.onload = function () {
     }
 
     function buildGUI(stackHelper) {
-        var stack = stackHelper._stack;
+        var _createGui = createGui(),
+            stack = _createGui.stack,
+            gui = _createGui.gui;
 
-        var gui = new dat.GUI({
-            autoPlace: false
-        });
+        function createGui() {
+            var stack = stackHelper._stack;
 
-        var customContainer = document.getElementById('my-gui-container');
-        customContainer.appendChild(gui.domElement);
+            var gui = new dat.GUI({
+                autoPlace: false
+            });
 
-        var stackFolder = gui.addFolder('Stack');
-        stackFolder.add(stackHelper.slice, 'windowWidth', 1, stack.minMax[1] - stack.minMax[0]).step(1).listen();
-        stackFolder.add(stackHelper.slice, 'windowCenter', stack.minMax[0], stack.minMax[1]).step(1).listen();
-        stackFolder.add(stackHelper.slice, 'intensityAuto').listen();
-        stackFolder.add(stackHelper.slice, 'invert');
-        stackFolder.add(stackHelper.slice, 'interpolation', 0, 1).step(1).listen();
+            var customContainer = document.getElementById('my-gui-container');
+            customContainer.appendChild(gui.domElement);
+            return { stack: stack, gui: gui };
+        }
+
+        var stackFolder = createStackFolderOnGui();
+
+        function createStackFolderOnGui() {
+            var stackFolder = gui.addFolder('Stack');
+            return stackFolder;
+        }
+
+        setWindowWidth();
+
+        function setWindowWidth() {
+            var minWidth = 1;
+            var maxWidth = stack.minMax[1] - stack.minMax[0];
+            stackFolder.add(stackHelper.slice, 'windowWidth', minWidth, maxWidth).step(1).listen();
+        }
+
+        setWindowCenter();
+
+        function setWindowCenter() {
+            var minCenter = stack.minMax[0];
+            var maxCenter = stack.minMax[1];
+            stackFolder.add(stackHelper.slice, 'windowCenter', minCenter, maxCenter).step(1).listen();
+        }
+
+        setIntensity();
+
+        function setIntensity() {
+            stackFolder.add(stackHelper.slice, 'intensityAuto').listen();
+        }
+
+        setInvert();
+
+        function setInvert() {
+            stackFolder.add(stackHelper.slice, 'invert');
+        }
+
+        setInterpolation();
+
+        function setInterpolation() {
+            var minInterpolation = 0;
+            var maxInterpolation = 1;
+            stackFolder.add(stackHelper.slice, 'interpolation', minInterpolation, maxInterpolation).step(1).listen();
+        }
 
         // CREATE LUT
-        lut = new _helpers4.default('my-lut-canvases', 'default', 'linear', [[0, 0, 0, 0], [1, 1, 1, 1]], [[0, 1], [1, 1]]);
-        lut.luts = _helpers4.default.presetLuts();
 
-        var lutUpdate = stackFolder.add(stackHelper.slice, 'lut', lut.lutsAvailable());
-        lutUpdate.onChange(function (value) {
-            lut.lut = value;
-            stackHelper.slice.lutTexture = lut.texture;
-        });
-        var lutDiscrete = stackFolder.add(lut, 'discrete', false);
-        lutDiscrete.onChange(function (value) {
-            lut.discrete = value;
-            stackHelper.slice.lutTexture = lut.texture;
-        });
+        setLUT();
 
-        var index = stackFolder.add(stackHelper, 'index', 0, stack.dimensionsIJK.z - 1).step(1).listen();
+        function setLUT() {
+            createLUT();
+
+            function createLUT() {
+                var domTarget = 'my-lut-canvases';
+                var lookUpTable = 'default';
+                var modeToApplyGradientInLut = 'linear_full';
+                var color = [[0, 0, 0, 0], [1, 1, 1, 1]];
+                var opacity = [[0, 1], [1, 1]];
+                lut = new _helpers4.default(domTarget, lookUpTable, modeToApplyGradientInLut, color, opacity);
+                lut.luts = _helpers4.default.presetLuts();
+            }
+
+            updateLUT();
+
+            function updateLUT() {
+                var lutUpdate = stackFolder.add(stackHelper.slice, 'lut', lut.lutsAvailable());
+                lutUpdate.onChange(function (value) {
+                    lut.lut = value;
+                    stackHelper.slice.lutTexture = lut.texture;
+                });
+            }
+
+            discreteLUT();
+
+            function discreteLUT() {
+                var lutDiscrete = stackFolder.add(lut, 'discrete', false);
+                lutDiscrete.onChange(function (value) {
+                    lut.discrete = value;
+                    stackHelper.slice.lutTexture = lut.texture;
+                });
+            }
+        }
+
+        var index = setIndex();
+
+        function setIndex() {
+            var minIndex = 0;
+            var maxIndex = stack.dimensionsIJK.z - 1;
+            var index = stackFolder.add(stackHelper, 'index', minIndex, maxIndex).step(1).listen();
+            return index;
+        }
+
         stackFolder.open();
 
-        // camera
-        var cameraFolder = gui.addFolder('Camera');
-        var invertRows = cameraFolder.add(camUtils, 'invertRows');
-        invertRows.onChange(function () {
-            camera.invertRows();
-            updateLabels(camera.directionsLabel, stack.modality);
-        });
+        createCameraFolderOnGui();
 
-        var invertColumns = cameraFolder.add(camUtils, 'invertColumns');
-        invertColumns.onChange(function () {
-            camera.invertColumns();
-            updateLabels(camera.directionsLabel, stack.modality);
-        });
+        function createCameraFolderOnGui() {
+            var cameraFolder = gui.addFolder('Camera');
 
-        var angle = cameraFolder.add(camera, 'angle', 0, 360).step(1).listen();
-        angle.onChange(function () {
-            updateLabels(camera.directionsLabel, stack.modality);
-        });
+            setInvertRows();
 
-        var rotate = cameraFolder.add(camUtils, 'rotate');
-        rotate.onChange(function () {
-            camera.rotate();
-            updateLabels(camera.directionsLabel, stack.modality);
-        });
+            function setInvertRows() {
+                var invertRows = cameraFolder.add(camUtils, 'invertRows');
+                invertRows.onChange(function () {
+                    camera.invertRows();
+                    updateLabels(camera.directionsLabel, stack.modality);
+                });
+            }
 
-        var orientationUpdate = cameraFolder.add(camUtils, 'orientation', ['default', 'axial', 'coronal', 'sagittal']);
-        orientationUpdate.onChange(function (value) {
-            camera.orientation = value;
-            camera.update();
-            camera.fitBox(2);
-            stackHelper.orientation = camera.stackOrientation;
-            updateLabels(camera.directionsLabel, stack.modality);
+            function setInvertColumns() {
+                var invertColumns = cameraFolder.add(camUtils, 'invertColumns');
+                invertColumns.onChange(function () {
+                    camera.invertColumns();
+                    updateLabels(camera.directionsLabel, stack.modality);
+                });
+            }
 
-            index.__max = stackHelper.orientationMaxIndex;
-            stackHelper.index = Math.floor(index.__max / 2);
-        });
+            setInvertColumns();
 
-        var conventionUpdate = cameraFolder.add(camUtils, 'convention', ['radio', 'neuro']);
-        conventionUpdate.onChange(function (value) {
-            camera.convention = value;
-            camera.update();
-            camera.fitBox(2);
-            updateLabels(camera.directionsLabel, stack.modality);
-        });
+            var angle = cameraFolder.add(camera, 'angle', 0, 360).step(1).listen();
+            angle.onChange(function () {
+                updateLabels(camera.directionsLabel, stack.modality);
+            });
+
+            setRotation();
+
+            function setRotation() {
+                var rotate = cameraFolder.add(camUtils, 'rotate');
+                rotate.onChange(function () {
+                    camera.rotate();
+                    updateLabels(camera.directionsLabel, stack.modality);
+                });
+            }
+
+            setOrientation();
+
+            function setOrientation() {
+                var orientationUpdate = cameraFolder.add(camUtils, 'orientation', ['default', 'axial', 'coronal', 'sagittal']);
+
+                updateOrientation();
+
+                function updateOrientation() {
+                    orientationUpdate.onChange(function (value) {
+                        camera.orientation = value;
+                        camera.update();
+
+                        var numberOfDirectionsToRecalculateCameraZoom = 2;
+                        camera.fitBox(numberOfDirectionsToRecalculateCameraZoom);
+                        stackHelper.orientation = camera.stackOrientation;
+                        updateLabels(camera.directionsLabel, stack.modality);
+
+                        index.__max = stackHelper.orientationMaxIndex;
+                        stackHelper.index = putRotationAnglesSliderAtMediumPointOnGui();
+
+                        function putRotationAnglesSliderAtMediumPointOnGui() {
+                            return Math.floor(index.__max / 2);
+                        }
+                    });
+                }
+            }
+
+            setConvention();
+
+            function setConvention() {
+                var conventionUpdate = cameraFolder.add(camUtils, 'convention', ['radio', 'neuro']);
+                conventionUpdate.onChange(function (value) {
+                    camera.convention = value;
+                    camera.update();
+                    camera.fitBox(2);
+                    updateLabels(camera.directionsLabel, stack.modality);
+                });
+            }
+        }
     }
 
     /**
@@ -213,20 +337,24 @@ window.onload = function () {
      */
     function hookCallbacks(stackHelper) {
         var stack = stackHelper._stack;
-        // hook up callbacks
-        controls.addEventListener('OnScroll', function (e) {
-            if (e.delta > 0) {
-                if (stackHelper.index >= stackHelper.orientationMaxIndex - 1) {
-                    return false;
+
+        setOnScrollControl();
+
+        function setOnScrollControl() {
+            controls.addEventListener('OnScroll', function (e) {
+                if (e.delta > 0) {
+                    if (stackHelper.index >= stackHelper.orientationMaxIndex - 1) {
+                        return false;
+                    }
+                    stackHelper.index += 1;
+                } else {
+                    if (stackHelper.index <= 0) {
+                        return false;
+                    }
+                    stackHelper.index -= 1;
                 }
-                stackHelper.index += 1;
-            } else {
-                if (stackHelper.index <= 0) {
-                    return false;
-                }
-                stackHelper.index -= 1;
-            }
-        });
+            });
+        }
 
         /**
          * On window resize callback
@@ -315,29 +443,53 @@ window.onload = function () {
 
         console.log(stackHelper.stack);
 
-        // set camera
-        var worldbb = stack.worldBoundingBox();
-        var lpsDims = new THREE.Vector3((worldbb[1] - worldbb[0]) / 2, (worldbb[3] - worldbb[2]) / 2, (worldbb[5] - worldbb[4]) / 2);
+        setCamera();
 
-        // box: {halfDimensions, center}
-        var box = {
-            center: stack.worldCenter().clone(),
-            halfDimensions: new THREE.Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10)
-        };
+        function setCamera() {
+            var lpsDims = calculateLPSCoordinates();
 
-        // init and zoom
-        var canvas = {
-            width: threeD.clientWidth,
-            height: threeD.clientHeight
-        };
+            function calculateLPSCoordinates() {
+                var worldbb = stack.worldBoundingBox();
+                var leftRightDimension = (worldbb[1] - worldbb[0]) / 2;
+                var posteriorAnteriorDimension = (worldbb[3] - worldbb[2]) / 2;
+                var superiorInferiorDimension = (worldbb[5] - worldbb[4]) / 2;
+                var lpsDims = new THREE.Vector3(leftRightDimension, posteriorAnteriorDimension, superiorInferiorDimension);
+                return lpsDims;
+            }
 
-        camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
-        camera.box = box;
-        camera.canvas = canvas;
-        camera.update();
-        camera.fitBox(2);
+            var box = calculateCameraFieldOfView();
 
-        updateLabels(camera.directionsLabel, stack.modality);
+            function calculateCameraFieldOfView() {
+                var box = {
+                    center: stack.worldCenter().clone(),
+                    halfDimensions: new THREE.Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10)
+                };
+                return box;
+            }
+
+            var canvas = createCanvas();
+
+            function createCanvas() {
+                var canvas = {
+                    width: threeD.clientWidth,
+                    height: threeD.clientHeight
+                };
+                return canvas;
+            }
+
+            configureCamera();
+
+            function configureCamera() {
+                camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
+                camera.box = box;
+                camera.canvas = canvas;
+                camera.update();
+                camera.fitBox(2);
+            }
+
+            updateLabels(camera.directionsLabel, stack.modality);
+        }
+
         buildGUI(stackHelper);
         hookCallbacks(stackHelper);
     }
@@ -362,8 +514,16 @@ window.onload = function () {
      * Parse incoming files
      */
     function readMultipleFiles(evt) {
-        // hide the upload button
-        if (evt.target.files.length) {
+
+        if (filesHaveBeenLoaded()) {
+            hideFileUploadButton();
+        }
+
+        function filesHaveBeenLoaded() {
+            return evt.target.files.length;
+        }
+
+        function hideFileUploadButton() {
             document.getElementById('home-container').style.display = 'none';
         }
 
@@ -371,21 +531,31 @@ window.onload = function () {
          * Load sequence
          */
         function loadSequence(index, files) {
-            return Promise.resolve()
-            // load the file
-            .then(function () {
-                return new Promise(function (resolve, reject) {
-                    var myReader = new FileReader();
-                    // should handle errors too...
-                    myReader.addEventListener('load', function (e) {
-                        resolve(e.target.result);
+            return Promise.resolve().then(function () {
+
+                return read();
+
+                function read() {
+                    return new Promise(function (resolve, reject) {
+                        var myReader = new FileReader();
+                        myReader.addEventListener('load', function (e) {
+                            resolve(e.target.result);
+                        });
+                        myReader.readAsArrayBuffer(files[index]);
                     });
-                    myReader.readAsArrayBuffer(files[index]);
-                });
+                }
             }).then(function (buffer) {
-                return loader.parse({ url: files[index].name, buffer: buffer });
+                return parse();
+
+                function parse() {
+                    return loader.parse({ url: files[index].name, buffer: buffer });
+                }
             }).then(function (series) {
-                seriesContainer.push(series);
+                load();
+
+                function load() {
+                    seriesContainer.push(series);
+                }
             }).catch(function (error) {
                 window.console.log('oops... something went wrong...');
                 window.console.log(error);
@@ -400,14 +570,21 @@ window.onload = function () {
 
             var _loop = function _loop(i) {
                 fetchSequence.push(new Promise(function (resolve, reject) {
-                    var myReader = new FileReader();
-                    // should handle errors too...
-                    myReader.addEventListener('load', function (e) {
-                        resolve(e.target.result);
-                    });
-                    myReader.readAsArrayBuffer(files[i].file);
+                    read();
+
+                    function read() {
+                        var myReader = new FileReader();
+                        myReader.addEventListener('load', function (e) {
+                            resolve(e.target.result);
+                        });
+                        myReader.readAsArrayBuffer(files[i].file);
+                    }
                 }).then(function (buffer) {
-                    return { url: files[i].file.name, buffer: buffer };
+                    return parse();
+
+                    function parse() {
+                        return { url: files[i].file.name, buffer: buffer };
+                    }
                 }));
             };
 
@@ -429,45 +606,62 @@ window.onload = function () {
 
         var data = [];
         var dataGroups = [];
-        // convert object into array
-        for (var i = 0; i < evt.target.files.length; i++) {
-            var dataUrl = _core2.default.parseUrl(evt.target.files[i].name);
-            if (dataUrl.extension.toUpperCase() === 'MHD' || dataUrl.extension.toUpperCase() === 'RAW') {
-                dataGroups.push({
-                    file: evt.target.files[i],
-                    extension: dataUrl.extension.toUpperCase()
-                });
-            } else {
-                data.push(evt.target.files[i]);
+
+        convertObjectIntoArray();
+
+        function convertObjectIntoArray() {
+            for (var i = 0; i < evt.target.files.length; i++) {
+                var dataUrl = _core2.default.parseUrl(evt.target.files[i].name);
+                if (dataUrl.extension.toUpperCase() === 'MHD' || dataUrl.extension.toUpperCase() === 'RAW') {
+                    dataGroups.push({
+                        file: evt.target.files[i],
+                        extension: dataUrl.extension.toUpperCase()
+                    });
+                } else {
+                    data.push(evt.target.files[i]);
+                }
             }
         }
 
-        // check if some files must be loaded together
-        if (dataGroups.length === 2) {
-            // if raw/mhd pair
+        if (someFilesMustBeLoadedTogether()) {
+            var _someFilesMustBeLoadedTogether = function _someFilesMustBeLoadedTogether() {
+                return dataGroups.length === 2;
+            };
+
             var mhdFile = dataGroups.filter(_filterByExtension.bind(null, 'MHD'));
             var rawFile = dataGroups.filter(_filterByExtension.bind(null, 'RAW'));
-            if (mhdFile.length === 1 && rawFile.length === 1) {
+            if (thereIsRawMhdPair()) {
+                var _thereIsRawMhdPair = function _thereIsRawMhdPair() {
+                    return mhdFile.length === 1 && rawFile.length === 1;
+                };
+
                 loadSequenceContainer.push(loadSequenceGroup(dataGroups));
             }
         }
+        loadTheRestOfTheFiles();
 
-        // load the rest of the files
-        for (var _i = 0; _i < data.length; _i++) {
-            loadSequenceContainer.push(loadSequence(_i, data));
+        function loadTheRestOfTheFiles() {
+            for (var i = 0; i < data.length; i++) {
+                loadSequenceContainer.push(loadSequence(i, data));
+            }
         }
 
-        // run the load sequence
-        // load sequence for all files
-        Promise.all(loadSequenceContainer).then(function () {
-            handleSeries(seriesContainer);
-        }).catch(function (error) {
-            window.console.log('oops... something went wrong...');
-            window.console.log(error);
-        });
+        runTheLoadSequenceForAllFiles();
+
+        function runTheLoadSequenceForAllFiles() {
+            Promise.all(loadSequenceContainer).then(function () {
+                handleSeries(seriesContainer);
+            }).catch(function (error) {
+                window.console.log('oops... something went wrong...');
+                window.console.log(error);
+            });
+        }
     }
 
-    // hook up file input listener
-    document.getElementById('filesinput').addEventListener('change', readMultipleFiles, false);
+    hookUpFileInputListener();
+
+    function hookUpFileInputListener() {
+        document.getElementById('filesinput').addEventListener('change', readMultipleFiles, false);
+    }
 };
 //# sourceMappingURL=viewers_upload.js.map

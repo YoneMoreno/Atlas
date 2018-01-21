@@ -19,7 +19,9 @@
         <item url="file://$PROJECT_DIR$/dist/ami/examples/viewers_upload/viewers_upload.js" />
         <item url="file://$PROJECT_DIR$/dist/ami/build/ami.min.js" />
         <item url="file://$PROJECT_DIR$/dist/ami/lessons/02/demo.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/helpers/helpers.js" />
         <item url="file://$PROJECT_DIR$/dist/ami/legacy/vr_doublepass/vr_doublepass.js" />
+        <item url="file://$PROJECT_DIR$/dist/ami/src/helpers/helpers.lut.js" />
       </sourceFilesUrls>
     </properties>
     <CLASSES>
@@ -40,7 +42,9 @@
       <root url="file://$PROJECT_DIR$/dist/ami/examples/viewers_upload/viewers_upload.js" />
       <root url="file://$PROJECT_DIR$/dist/ami/build/ami.min.js" />
       <root url="file://$PROJECT_DIR$/dist/ami/lessons/02/demo.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/helpers/helpers.js" />
       <root url="file://$PROJECT_DIR$/dist/ami/legacy/vr_doublepass/vr_doublepass.js" />
+      <root url="file://$PROJECT_DIR$/dist/ami/src/helpers/helpers.lut.js" />
     </CLASSES>
     <SOURCES />
   </library>
